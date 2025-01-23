@@ -1,0 +1,2 @@
+# Club-Manager
+Proiect licenta
