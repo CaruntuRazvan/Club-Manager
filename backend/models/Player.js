@@ -14,8 +14,26 @@ const playerSchema = new mongoose.Schema({
       endYear: { type: Number, required: true },
     }
   ],
-  image: { type: String }
-
+  image: { type: String },
+  // Atribute noi
+  position: { 
+    type: String, 
+    required: true, 
+    enum: ['Goalkeeper', 'Defender', 'Midfielder', 'Forward'] // Poți extinde lista
+  },
+  shirtNumber: { type: Number },
+  phoneNumber: { type: String },
+  preferredFoot: { 
+    type: String, 
+    required: true, 
+    enum: ['right', 'left', 'both'], 
+    default: 'right' 
+  },
+  status: { 
+    type: String, 
+    enum: ['notInjured', 'recovering', 'injured'], 
+    default: 'notInjured' 
+  }
 }, { timestamps: true });
 
 const Player = mongoose.model('Player', playerSchema);
