@@ -1,0 +1,127 @@
+.admin-container, .player-container {
+    display: flex;
+    min-height: 100vh;
+    background: linear-gradient(to right, #022c5a, #3b82f6);
+}
+
+.sidebar {
+    width: 250px;
+    background-color: #021d3a;
+    color: white;
+    padding: 20px;
+    position: fixed;
+    height: 100%;
+}
+
+.team-logo {
+    width: 110px;
+    height: auto;
+    display: block;
+    margin: 0 auto 30px;
+    transition: transform 0.3s ease;
+}
+
+.team-logo:hover {
+    transform: scale(1.05);
+    /* Efect de scalare la hover */
+}
+
+.admin-profile, .player-profile {
+    background-color: white;
+    padding: 10px;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+}
+
+.admin-profile p, .player-profile p{
+    margin: 5px 0;
+    color: #1e3a8a;
+}
+
+.admin-profile p strong, .player-profile p strong {
+    color: #1e3a8a;
+}
+
+.sidebar ul {
+    list-style: none;
+    padding: 0;
+}
+
+.sidebar li {
+    padding: 10px;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.sidebar li:hover {
+    background-color: #1a3c6e;
+}
+
+.sidebar li.active {
+    background-color: #3b82f6;
+}
+
+.main-content {
+    margin-left: 250px;
+    flex-grow: 1;
+    padding: 20px;
+}
+
+.header {
+    background-color: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.header h1 {
+    color: #1e3a8a;
+}
+
+.logout-btn {
+    background-color: #ff4444;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    position: relative;
+    transition: background-color 0.3s, transform 0.2s;
+}
+
+.logout-btn:hover {
+    background-color: #cc0000;
+    transform: scale(1.1);
+}
+
+/* Textul ascuns */
+.logout-text {
+    position: absolute;
+    bottom: -30px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: black;
+    color: white;
+    padding: 5px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    white-space: nowrap;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.2s ease-in-out, visibility 0.2s ease-in-out;
+}
+
+/* Afișare text la hover */
+.logout-btn:hover .logout-text {
+    opacity: 1;
+    visibility: visible;
+}

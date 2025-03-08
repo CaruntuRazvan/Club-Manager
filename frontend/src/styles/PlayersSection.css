@@ -1,0 +1,65 @@
+/* Stiluri pentru secțiunea jucătorilor */
+.players-section {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 20px;
+    background: #f4f4f4;
+}
+
+.player-category {
+    text-align: left;
+    padding: 30px;
+}
+
+.player-category h2 {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 15px;
+}
+
+.players-list {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 40px;
+    max-width: calc(240px * 4 + 40px * 3);
+    /* Fits 4 cards + 3 gaps */
+}
+
+/* Modificări specifice cartonaselor - fără alte elemente */
+.player-card {
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    height: 320px;
+    width: 240px;
+    overflow: hidden;
+    position: relative;
+}
+
+.player-image {
+    width: 100%;
+    height: 270px;
+    object-fit: cover;
+    border-radius: 10px 10px 0 0;
+}
+
+.player-info {
+    padding: 5px;
+    height: 50px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.player-number {
+    font-size: 1rem;
+    margin-bottom: 2px;
+}
+
+.player-name {
+    font-size: 0.9rem;
+    line-height: 1.2;
+}

@@ -1,0 +1,112 @@
+/* Reset de bază pentru consistență */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Arial', sans-serif;
+}
+
+/* Container principal - centrat pe pagină, fundal gradient modern (albastru la alb la gri) */
+.login-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background: linear-gradient(135deg, #000208,#334692, #646e94, #fbfcff);
+    /* Albastru închis la alb la gri deschis */
+    padding: 20px;
+}
+
+/* Formularul de login - card modern cu umbră și margini rotunjite */
+.login-form {
+    background-color: white;
+    padding: 2rem 3rem;
+    border-radius: 15px;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 400px;
+    text-align: center;
+}
+
+/* Logo-ul echipei - afișat în partea de sus, centrat */
+.team-logo-login {
+    width: 200px;
+    /* Dimensiune potrivită pentru logo */
+    height: auto;
+    margin-bottom: 1.5rem;
+    border-radius: 10px;
+    /* Opțional, pentru un aspect mai moale */
+}
+
+
+/* Grupul de input - design curat și modern */
+.input-group {
+    margin-bottom: 1rem;
+    text-align: left;
+}
+
+/* Etichetele (labels) - design modern, cu albastru, bold și efect subtil */
+.input-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-size: 1rem;
+    color: #1a2a6c;
+    font-weight: 600;
+    transition: color 0.3s ease;
+
+}
+
+
+.input-group input {
+    width: 100%;
+    padding: 0.8rem;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: border-color 0.3s ease;
+}
+
+.input-group input:focus {
+    outline: none;
+    border-color: #1a2a6c;
+    /* Albastru închis la focus */
+    box-shadow: 0 0 5px rgba(26, 42, 108, 0.3);
+}
+
+/* Butonul de login - modern, cu hover efect */
+.login-btn {
+    width: 100%;
+    padding: 1rem;
+    background-color: #1a2a6c;
+    /* Albastru închis */
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.login-btn:hover {
+    background-color: #d3d3d3;
+    /* Gri deschis, pentru un efect subtil și armonios cu paleta alb-albastru */
+    transform: translateY(-2px);
+    /* Efect de ridicare la hover */
+}
+
+/* Responsive design - ajustări pentru ecrane mai mici */
+@media (max-width: 480px) {
+    .login-form {
+        padding: 1.5rem 2rem;
+        width: 90%;
+    }
+
+    .login-form h2 {
+        font-size: 1.5rem;
+    }
+
+    .team-logo {
+        width: 100px;
+    }
+}
