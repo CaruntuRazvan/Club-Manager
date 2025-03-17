@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { fetchPlayers } from '../services/userService';
 import '../styles/PlayersSection.css';
 
-const PlayersSection = () => {
+const PlayersSection = ({ onPlayerClick }) => {
   const [players, setPlayers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -12,8 +12,8 @@ const PlayersSection = () => {
       try {
         setLoading(true);
         const users = await fetchPlayers();
-        console.log('Jucători preluați:', users); // Log pentru depanare
-        setPlayers(users);
+        console.log('Jucători preluați:', users);
+        setPlayers(users); // Setăm toți jucătorii, inclusiv cel logat
       } catch (err) {
         setError('Eroare la încărcarea jucătorilor.');
         console.error('Eroare fetchPlayers:', err);
@@ -41,13 +41,14 @@ const PlayersSection = () => {
               <div className="player-image-wrapper">
                 <div className="background-logo"></div>
                 <img
-                 src={
-                 player.playerId?.image 
-                ? `http://localhost:5000${player.playerId.image}`
-                : '/images/default-user.jpg'
-                  } 
+                  src={
+                    player.playerId?.image
+                      ? `http://localhost:5000${player.playerId.image}`
+                      : '/images/default-user.jpg'
+                  }
                   alt={player.name}
                   className="player-image"
+                  onClick={() => onPlayerClick(player)} // Deschide profilul la click
                   onError={(e) => {
                     e.target.src = '/path-to-placeholder-image.jpg';
                     console.log(`Eroare la încărcarea imaginii pentru ${player.name}`);
@@ -55,7 +56,7 @@ const PlayersSection = () => {
                 />
               </div>
               <div className="player-info">
-                <span className="player-number">{player.playerId?.shirtNumber || 'N/A'}</span> {/* Ajustăm playerDetails la playerId */}
+                <span className="player-number">{player.playerId?.shirtNumber || 'N/A'}</span>
                 <span className="player-name">{player.name.toUpperCase()}</span>
               </div>
             </div>

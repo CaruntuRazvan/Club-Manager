@@ -3,6 +3,7 @@ import { fetchCurrentUser } from '../services/userService';
 import AboutTeam from './AboutTeam';
 import PlayersSection from '../components/PlayersSection';
 import EventCalendar from '../components/EventCalendar';
+import UserProfile from '../components/UserProfile'; // Asumăm că UserProfile este în components
 import '../styles/PlayerPage.css';
 import '../styles/GlobalStyles.css';
 
@@ -11,6 +12,7 @@ const PlayerPage = ({ userId, handleLogout }) => {
   const [activeSection, setActiveSection] = useState('profile');
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [eventColor, setEventColor] = useState(localStorage.getItem('eventColor') || '#3788d8');
+  const [selectedUser, setSelectedUser] = useState(null); // State pentru utilizatorul selectat în modal
   const settingsModalRef = useRef(null);
   const role = 'player';
 
@@ -32,10 +34,11 @@ const PlayerPage = ({ userId, handleLogout }) => {
 
     loadPlayerInfo();
   }, [userId, role]);
+
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (settingsModalRef.current && !settingsModalRef.current.contains(event.target)) {
-        setIsSettingsOpen(false); // Închide modalul
+        setIsSettingsOpen(false);
       }
     };
 
@@ -62,17 +65,25 @@ const PlayerPage = ({ userId, handleLogout }) => {
   const handleColorChange = (color) => {
     setEventColor(color);
     localStorage.setItem('eventColor', color);
-    setIsSettingsOpen(false); // Închide modalul după selectare
+    setIsSettingsOpen(false);
   };
 
-  // Lista de culori predefinite
-  const predefinedColors = [
-    { name: 'Roșu', value: '#ff0000' },
-    { name: 'Albastru', value: '#3788d8' },
-    { name: 'Verde', value: '#00ff00' },
-    { name: 'Mov', value: '#800080' },
-    { name: 'Galben', value: '#ffff00' },
-  ];
+  const handleOpenProfile = (user) => {
+    setSelectedUser(user); // Deschide modalul cu datele utilizatorului selectat
+  };
+
+  const handleCloseProfile = () => {
+    setSelectedUser(null); // Închide modalul
+  };
+
+ const predefinedColors = [
+  { name: 'Roșu Cărămidă', value: '#c0392b' }, // Roșu cald pentru evenimente importante
+  { name: 'Galben Auriu', value: '#f1c40f' }, // Galben pentru celebrări
+  { name: 'Mov Regal', value: '#8e44ad' }, // Mov pentru evenimente speciale
+  { name: 'Albastru Deschis', value: '#3498db' }, // Albastru deschis pentru zile relaxante
+  { name: 'Verde Măsliniu', value: '#27ae60' }, // Verde sobru pentru sesiuni tactice
+  { name: 'Roz Coral', value: '#e91e63' }, // Roz pentru evenimente sociale
+];
 
   return (
     <div className="player-container">
@@ -121,7 +132,7 @@ const PlayerPage = ({ userId, handleLogout }) => {
             <button
               onClick={() => setIsSettingsOpen(true)}
               className="settings-btn"
-              title="Settings" // Tooltip nativ pentru accesibilitate
+              title="Settings"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -161,7 +172,7 @@ const PlayerPage = ({ userId, handleLogout }) => {
         {/* Modal de setări */}
         {isSettingsOpen && (
           <div className="settings-modal-overlay">
-            <div className="settings-modal"  ref={settingsModalRef}>
+            <div className="settings-modal" ref={settingsModalRef}>
               <button
                 className="modal-close-btn"
                 onClick={() => setIsSettingsOpen(false)}
@@ -289,12 +300,16 @@ const PlayerPage = ({ userId, handleLogout }) => {
             </div>
           </section>
         )}
-
         {/* Secțiunea Despre Echipa */}
         {activeSection === 'team' && <AboutTeam />}
 
-        {/* Secțiunea Utilizatori */}
-        {activeSection === 'players' && <PlayersSection />}
+        {/* Secțiunea Jucatori */}
+        {activeSection === 'players' && (
+          <PlayersSection
+            onPlayerClick={handleOpenProfile} // Trecem funcția de callback
+           // currentUserId={userId} // Trecem userId-ul curent pentru a exclude utilizatorul curent din listă (opțional)
+          />
+        )}
 
         {/* Secțiunea Calendar */}
         {activeSection === 'calendar' && (
@@ -302,6 +317,15 @@ const PlayerPage = ({ userId, handleLogout }) => {
             <h2>Calendar Evenimente</h2>
             <EventCalendar userId={userId} eventColor={eventColor} />
           </section>
+        )}
+
+        {/* Modal pentru profilul jucătorului selectat */}
+        {selectedUser && (
+          <UserProfile
+            user={selectedUser}
+            onClose={handleCloseProfile}
+            calculateAge={calculateAge}
+          />
         )}
       </div>
     </div>

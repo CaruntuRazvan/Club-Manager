@@ -35,6 +35,11 @@ export const fetchPlayers = async () => {
 };
 export const addUser = async (userData) => {
   try {
+    const token = localStorage.getItem('token'); // Obținem token-ul din localStorage
+    if (!token) {
+      throw new Error('Token-ul nu este disponibil. Te rugăm să te autentifici.');
+    }
+
     const formData = new FormData();
 
     // Adaugăm câmpurile de bază
@@ -70,6 +75,9 @@ export const addUser = async (userData) => {
 
     const response = await fetch('http://localhost:5000/api/users/add', {
       method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`, // Adăugăm token-ul în header
+      },
       body: formData,
     });
 
@@ -78,6 +86,34 @@ export const addUser = async (userData) => {
       return data.user;
     } else {
       throw new Error(data.message || 'Eroare la adăugarea utilizatorului.');
+    }
+  } catch (error) {
+    console.error('Error:', error);
+    throw error;
+  }
+};
+
+export const deleteUser = async (email) => {
+  try {
+    const token = localStorage.getItem('token'); // Obținem token-ul din localStorage
+    if (!token) {
+      throw new Error('Token-ul nu este disponibil. Te rugăm să te autentifici.');
+    }
+
+    const response = await fetch('http://localhost:5000/api/users/delete', {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`, // Adăugăm token-ul în header
+      },
+      body: JSON.stringify({ email }),
+    });
+
+    const data = await response.json();
+    if (response.ok) {
+      return data.message;
+    } else {
+      throw new Error(data.message || 'Eroare la ștergerea utilizatorului.');
     }
   } catch (error) {
     console.error('Error:', error);
@@ -111,42 +147,27 @@ export const fetchCurrentUser = async (id, role) => {
     return null;
   }
 };
-
-export const deleteUser = async (email) => {
-  try {
-    const response = await fetch('http://localhost:5000/api/users/delete', {
-      method: 'DELETE',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email }),
-    });
-    const data = await response.json();
-    if (response.ok) {
-      return data.message;
-    } else {
-      throw new Error(data.message || 'Eroare la ștergerea utilizatorului.');
-    }
-  } catch (error) {
-    console.error('Error:', error);
-    throw error;
-  }
-};
 export const editUser = async (userId, userData) => {
   try {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      throw new Error('Token-ul nu este disponibil. Te rugăm să te autentifici.');
+    }
+
     const formData = new FormData();
 
-    // Adaugăm câmpurile de bază
     if (userData.name) formData.append('name', userData.name);
     if (userData.email) formData.append('email', userData.email);
     if (userData.password) formData.append('password', userData.password);
-    if (userData.role) formData.append('role', userData.role);
+    if (userData.role && ['player', 'manager', 'staff', 'admin'].includes(userData.role)) {
+      formData.append('role', userData.role);
+    }
 
-    // Adaugăm detaliile specifice rolului, fără imagine
     if (userData.playerDetails) {
       const { image, ...playerDetailsWithoutImage } = userData.playerDetails;
       formData.append('playerDetails', JSON.stringify(playerDetailsWithoutImage));
-      // Adaugăm imaginea doar dacă utilizatorul a încărcat una nouă
       if (image && typeof image !== 'string') {
-        formData.append('image', image); // Imaginea nouă, ca fișier
+        formData.append('image', image);
       }
     }
     if (userData.managerDetails) {
@@ -164,13 +185,15 @@ export const editUser = async (userId, userData) => {
       }
     }
 
-    // Logăm datele trimise pentru depanare
     console.log('userData trimis:', userData);
     console.log('Imagine trimisă:', formData.get('image'));
 
     const response = await fetch(`http://localhost:5000/api/users/${userId}`, {
       method: 'PUT',
-      body: formData, // Trimitem FormData
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
+      body: formData,
     });
 
     if (!response.ok) {
@@ -178,7 +201,8 @@ export const editUser = async (userId, userData) => {
       throw new Error(errorData.message || 'Eroare la actualizarea utilizatorului');
     }
 
-    return response.json();
+    const data = await response.json();
+    return data;
   } catch (error) {
     console.error('Eroare la editare:', error);
     throw error;
