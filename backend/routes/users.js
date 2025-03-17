@@ -8,7 +8,14 @@ const path = require('path');
 const fs = require('fs');
 const Manager = require('../models/Manager');
 const Staff = require('../models/Staff');
-
+const auth = require('../middleware/auth');
+// Middleware pentru a verifica dacă utilizatorul este admin
+const isAdmin = (req, res, next) => {
+  if (req.user.role !== 'admin') {
+    return res.status(403).json({ message: 'Acces permis doar administratorilor.' });
+  }
+  next();
+};
 
 const { loginUser} = require("../controllers/userController");
 
@@ -69,7 +76,8 @@ router.get("/", async (req, res) => {
     res.status(500).json({ message: 'Eroare la obținerea utilizatorilor.' });
   }
 });
-router.post('/add', upload.single('image'), async (req, res) => {
+// POST /add - Adaugă un utilizator nou (doar pentru admin)
+router.post('/add', upload.single('image'), auth, isAdmin, async (req, res) => {
   const { name, email, password, role, playerDetails, managerDetails, staffDetails } = req.body;
 
   // Verificare câmpuri obligatorii de bază
@@ -78,6 +86,12 @@ router.post('/add', upload.single('image'), async (req, res) => {
   }
 
   try {
+    // Verifică dacă email-ul există deja
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      return res.status(400).json({ message: 'Email-ul este deja utilizat!' });
+    }
+
     // Hashing parola
     const hashedPassword = await bcrypt.hash(password, 10);
 
@@ -102,11 +116,11 @@ router.post('/add', upload.single('image'), async (req, res) => {
         height,
         weight,
         history,
-        position,          // Nou
-        shirtNumber,      // Nou
-        phoneNumber,      // Nou
-        preferredFoot,    // Nou
-        status            // Nou
+        position,
+        shirtNumber,
+        phoneNumber,
+        preferredFoot,
+        status
       } = parsedPlayerDetails;
 
       // Verificare câmpuri obligatorii pentru Player
@@ -124,10 +138,10 @@ router.post('/add', upload.single('image'), async (req, res) => {
         history,
         image: imagePath,
         position,
-        shirtNumber: shirtNumber ? Number(shirtNumber) : undefined, // Opțional
-        phoneNumber, // Opțional
+        shirtNumber: shirtNumber ? Number(shirtNumber) : undefined,
+        phoneNumber,
         preferredFoot,
-        status // Opțional, va folosi valoarea implicită dacă nu e specificat
+        status
       });
 
       const savedPlayer = await newPlayer.save();
@@ -193,7 +207,7 @@ router.post('/add', upload.single('image'), async (req, res) => {
     res.status(500).json({ message: 'Eroare la adăugarea utilizatorului.', error: error.message });
   }
 });
-router.put('/:id', upload.single('image'), async (req, res) => {
+router.put('/:id', upload.single('image'), auth, isAdmin, async (req, res) => {
   const { id } = req.params;
   const { name, email, password, role, playerDetails, managerDetails, staffDetails } = req.body;
 
@@ -208,7 +222,7 @@ router.put('/:id', upload.single('image'), async (req, res) => {
     if (name) user.name = name;
     if (email) user.email = email;
     if (password) user.password = await bcrypt.hash(password, 10);
-    if (role) user.role = role;
+    if (role && ['player', 'manager', 'staff', 'admin'].includes(role)) user.role = role; // Validare explicită
 
     // Logăm datele primite pentru depanare
     console.log('req.body:', req.body);
@@ -220,43 +234,23 @@ router.put('/:id', upload.single('image'), async (req, res) => {
       if (player) {
         const parsedPlayerDetails = typeof playerDetails === 'string' ? JSON.parse(playerDetails) : playerDetails;
         
-        // Destructurăm noile câmpuri
-        const {
-          firstName,
-          lastName,
-          dateOfBirth,
-          nationality,
-          height,
-          weight,
-          history,
-          position,          // Nou
-          shirtNumber,      // Nou
-          phoneNumber,      // Nou
-          preferredFoot,    // Nou
-          status            // Nou
-        } = parsedPlayerDetails;
+        player.firstName = parsedPlayerDetails.firstName || player.firstName;
+        player.lastName = parsedPlayerDetails.lastName || player.lastName;
+        player.dateOfBirth = parsedPlayerDetails.dateOfBirth || player.dateOfBirth;
+        player.nationality = parsedPlayerDetails.nationality || player.nationality;
+        player.height = parsedPlayerDetails.height ? Number(parsedPlayerDetails.height) : player.height;
+        player.weight = parsedPlayerDetails.weight ? Number(parsedPlayerDetails.weight) : player.weight;
+        player.history = parsedPlayerDetails.history || player.history;
+        player.position = parsedPlayerDetails.position || player.position;
+        player.shirtNumber = parsedPlayerDetails.shirtNumber !== undefined ? Number(parsedPlayerDetails.shirtNumber) : player.shirtNumber;
+        player.phoneNumber = parsedPlayerDetails.phoneNumber || player.phoneNumber;
+        player.preferredFoot = parsedPlayerDetails.preferredFoot || player.preferredFoot;
+        player.status = parsedPlayerDetails.status || player.status;
 
-        // Actualizează câmpurile playerDetails
-        player.firstName = firstName || player.firstName;
-        player.lastName = lastName || player.lastName;
-        player.dateOfBirth = dateOfBirth || player.dateOfBirth;
-        player.nationality = nationality || player.nationality;
-        player.height = height || player.height;
-        player.weight = weight || player.weight;
-        player.history = history || player.history;
-        // Actualizează noile câmpuri
-        player.position = position || player.position;
-        player.shirtNumber = shirtNumber !== undefined ? Number(shirtNumber) : player.shirtNumber;
-        player.phoneNumber = phoneNumber !== undefined ? phoneNumber : player.phoneNumber;
-        player.preferredFoot = preferredFoot || player.preferredFoot;
-        player.status = status || player.status;
-
-        // Actualizează imaginea doar dacă s-a încărcat una nouă
         if (req.file) {
           const imagePath = `/${getDestination(role)}/${req.file.filename}`;
           player.image = imagePath;
-        } else if (parsedPlayerDetails.image) {
-          // Dacă imaginea nu s-a schimbat, păstrează calea veche
+        } else if (parsedPlayerDetails.image && typeof parsedPlayerDetails.image === 'string') {
           player.image = parsedPlayerDetails.image;
         }
 
@@ -276,7 +270,7 @@ router.put('/:id', upload.single('image'), async (req, res) => {
         if (req.file) {
           const imagePath = `/${getDestination(role)}/${req.file.filename}`;
           manager.image = imagePath;
-        } else if (parsedManagerDetails.image) {
+        } else if (parsedManagerDetails.image && typeof parsedManagerDetails.image === 'string') {
           manager.image = parsedManagerDetails.image;
         }
 
@@ -298,7 +292,7 @@ router.put('/:id', upload.single('image'), async (req, res) => {
         if (req.file) {
           const imagePath = `/${getDestination(role)}/${req.file.filename}`;
           staff.image = imagePath;
-        } else if (parsedStaffDetails.image) {
+        } else if (parsedStaffDetails.image && typeof parsedStaffDetails.image === 'string') {
           staff.image = parsedStaffDetails.image;
         }
 
@@ -314,8 +308,6 @@ router.put('/:id', upload.single('image'), async (req, res) => {
     res.status(500).json({ message: 'Eroare la actualizarea utilizatorului.', error: error.message });
   }
 });
-
-
 module.exports = router;
 
 
@@ -347,7 +339,7 @@ router.get('/:role/:id', async (req, res) => {
     res.status(500).json({ message: 'Internal server error' });
   }
 });
-router.delete('/delete', async (req, res) => {
+router.delete('/delete', auth, isAdmin, async (req, res) => {
   const { email } = req.body;
 
   if (!email) {
@@ -380,7 +372,7 @@ router.delete('/delete', async (req, res) => {
       }
     }
 
-    res.status(200).json({ 
+    res.status(200).json({
       message: 'Utilizator șters cu succes!',
       imageDeleted: imageDeleted ? 'Imaginea asociată a fost ștearsă.' : 'Nicio imagine găsită pentru acest utilizator.'
     });

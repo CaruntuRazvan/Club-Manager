@@ -22,17 +22,27 @@ const apiFetch = async (url, options = {}) => {
 };
 
 
-
 export const loginUser = async (email, password) => {
-  const data = await apiFetch('http://localhost:5000/api/users/login', {
-    method: 'POST',
-    body: JSON.stringify({ email, password }),
-  });
+  try {
+    const data = await apiFetch('http://localhost:5000/api/users/login', {
+      method: 'POST',
+      body: JSON.stringify({ email, password }),
+    });
 
-  //const data = await response.json();
+    console.log('Răspuns de la backend:', data); // Debug pentru a verifica structura
 
-  console.log('Răspuns de la backend:', data); // Debug pentru a verifica structura
-  return data; // Returnează întregul răspuns (cu token, user, message)
+    // Verificăm dacă răspunsul conține token-ul și îl salvăm în localStorage
+    if (data.token) {
+      localStorage.setItem('token', data.token);
+    } else {
+      throw new Error('Token-ul nu a fost primit de la backend.');
+    }
+
+    return data; // Returnăm întregul răspuns (cu token, user, message)
+  } catch (error) {
+    console.error('Eroare la autentificare:', error);
+    throw error;
+  }
 };
 
 

@@ -3,18 +3,18 @@ const router = express.Router();
 const Event = require('../models/Event');
 const auth = require('../middleware/auth');
 
-// Middleware pentru a verifica dacă utilizatorul este manager
-const isManager = (req, res, next) => {
-  if (req.user.role !== 'manager') {
-    return res.status(403).json({ message: 'Acces permis doar managerilor.' });
+// Middleware pentru a verifica dacă utilizatorul este manager sau staff
+const isManagerOrStaff = (req, res, next) => {
+  if (req.user.role !== 'manager' && req.user.role !== 'staff') {
+    return res.status(403).json({ message: 'Acces permis doar managerilor și staff-ului.' });
   }
   next();
 };
 
-// POST /api/events - Creează un eveniment nou (doar pentru manager)
-router.post('/', auth, isManager, async (req, res) => {
+// POST /api/events - Creează un eveniment nou (pentru manager sau staff)
+router.post('/', auth, isManagerOrStaff, async (req, res) => {
   try {
-    const { title, description, startDate, finishDate, players, staff } = req.body;
+    const { title, description, startDate, finishDate, players, staff, eventType } = req.body;
 
     // Creează evenimentul
     const event = new Event({
@@ -25,7 +25,8 @@ router.post('/', auth, isManager, async (req, res) => {
       players,
       staff,
       createdBy: req.user._id,
-      status: 'Scheduled'
+      status: 'Scheduled',
+      eventType: eventType || 'Training', // Adăugăm eventType cu o valoare implicită
     });
 
     await event.save();
@@ -36,7 +37,7 @@ router.post('/', auth, isManager, async (req, res) => {
   }
 });
 
-
+// GET /api/events - Obține evenimentele (pentru jucători)
 router.get('/', auth, async (req, res) => {
   try {
     let events;
@@ -53,4 +54,5 @@ router.get('/', auth, async (req, res) => {
     res.status(500).json({ message: 'Eroare la obținerea evenimentelor.' });
   }
 });
+
 module.exports = router;

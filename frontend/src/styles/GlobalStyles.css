@@ -1,4 +1,4 @@
-.admin-container, .player-container {
+.admin-container, .player-container, .manager-container {
     display: flex;
     min-height: 100vh;
     background: linear-gradient(to right, #022c5a, #3b82f6);
@@ -26,7 +26,7 @@
     /* Efect de scalare la hover */
 }
 
-.admin-profile, .player-profile {
+.admin-profile, .player-profile, .manager-profile {
     background-color: white;
     padding: 10px;
     border-radius: 10px;
@@ -34,12 +34,12 @@
     margin-bottom: 20px;
 }
 
-.admin-profile p, .player-profile p{
+.admin-profile p, .player-profile p, .manager-profile p {
     margin: 5px 0;
     color: #1e3a8a;
 }
 
-.admin-profile p strong, .player-profile p strong {
+.admin-profile p strong, .player-profile p strong, .manager-profile p strong {
     color: #1e3a8a;
 }
 
