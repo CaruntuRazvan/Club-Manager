@@ -1,23 +1,36 @@
 const mongoose = require('mongoose');
 
-const FeedbackSchema = new mongoose.Schema({
+const feedbackSchema = new mongoose.Schema({
   eventId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'Event',
-    required: true
+    ref: 'Event', // Referință la colecția Event
+    required: true,
   },
-  playerId: {
+  creatorId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'Player',
-    required: true
+    ref: 'User', // Referință la colecția User (antrenorul care a creat evenimentul)
+    required: true,
   },
-  text: {
+  receiverId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User', // Referință la colecția User (jucătorul pentru care se dă feedback-ul)
+    required: true,
+  },
+  satisfactionLevel: {
     type: String,
-    trim: true
+    enum: ['good', 'neutral', 'bad'], // Doar aceste valori sunt permise
+    required: true,
+    default: 'neutral', // Valoare implicită
   },
-  createdBy: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User', // Managerul sau staff-ul care a creat feedback-ul
-    required: true
-  }
-}, { timestamps: true });
+  comment: {
+    type: String,
+    trim: true, // Elimină spațiile inutile
+    default: '', // Comentariul este opțional
+  },
+}, { timestamps: true }); // Adaugă createdAt și updatedAt automat
+
+//feedback unic
+feedbackSchema.index({ eventId: 1, receiverId: 1 }, { unique: true });
+
+
+module.exports = mongoose.model('Feedback', feedbackSchema);

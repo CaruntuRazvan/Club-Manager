@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { fetchPlayers } from '../services/userService';
 import '../styles/PlayersSection.css';
 
-const PlayersSection = ({ onPlayerClick }) => {
+const PlayersSection = ({ onPlayerClick, currentUserId }) => {
   const [players, setPlayers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -37,7 +37,10 @@ const PlayersSection = ({ onPlayerClick }) => {
         <h2>{categoryTitle}</h2>
         <div className="players-list">
           {categoryPlayers.map(player => (
-            <div key={player._id} className="player-card">
+            <div
+              key={player._id}
+              className={`player-card ${player._id === currentUserId ? 'current-user' : ''}`} // Adaugă clasă pentru jucătorul logat
+            >
               <div className="player-image-wrapper">
                 <div className="background-logo"></div>
                 <img

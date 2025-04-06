@@ -7,6 +7,9 @@ const LoginForm = ({ setIsAuthenticated, setUserInfo }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [imageLoaded, setImageLoaded] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
+  const [showPassword, setShowPassword] = useState(false); // Păstrăm starea pentru toggle
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -17,22 +20,35 @@ const LoginForm = ({ setIsAuthenticated, setUserInfo }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setErrorMessage('');
+
+    if (!email.includes('@')) {
+      setErrorMessage('Introdu un email valid.');
+      return;
+    }
+
+    if (password.length < 6) {
+      setErrorMessage('Parola trebuie să aibă cel puțin 6 caractere.');
+      return;
+    }
+
+    setLoading(true);
     try {
-      const data = await loginUser(email, password); // Așteaptă răspunsul complet
-      const { token, user } = data; // Extrage token și user din obiectul data
+      setErrorMessage(null);
+      setLoading(true);
+      const data = await loginUser(email, password);
+      const { token, user } = data;
       setIsAuthenticated(true);
       setUserInfo(user);
+
       localStorage.setItem('user', JSON.stringify(user));
       localStorage.setItem('isAuthenticated', 'true');
-      localStorage.setItem('token', token); // Stocăm token-ul în localStorage
-      console.log('Token stocat:', token); // Debug pentru a verifica token-ul
-      if (user.role === 'admin') navigate(`/admin/${user.id}`);
-      else if (user.role === 'player') navigate(`/player/${user.id}`);
-      else if (user.role === 'manager') navigate(`/manager/${user.id}`);
-      else if (user.role === 'staff') navigate(`/staff/${user.id}`);
+      localStorage.setItem('token', token);
+      navigate(`/${user.role}/${user.id}`);
     } catch (error) {
-      console.error('Login error:', error.message);
-      alert(error.message);
+      setErrorMessage('Email sau parolă incorectă.');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -46,13 +62,44 @@ const LoginForm = ({ setIsAuthenticated, setUserInfo }) => {
         )}
         <div className="input-group">
           <label htmlFor="email">Email:</label>
-          <input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required placeholder="Enter your email" />
+          <input
+            id="email"
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+            placeholder="Enter your email"
+            autoFocus
+            disabled={loading}
+          />
         </div>
         <div className="input-group">
           <label htmlFor="password">Password:</label>
-          <input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required placeholder="Enter your password" />
+          <div className="password-wrapper">
+            <input
+              id="password"
+              type={showPassword ? 'text' : 'password'} // Comutăm între text și password
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              placeholder="Enter your password"
+              disabled={loading}
+            />
+            <button
+              type="button"
+              className="show-password-btn"
+              onClick={() => setShowPassword(!showPassword)}
+              aria-label={showPassword ? 'Ascunde parola' : 'Afișează parola'}
+              disabled={loading}
+            >
+              <span className="eye-icon">👁️‍🗨️</span> {/* Folosim același emoji */}
+            </button>
+          </div>
         </div>
-        <button type="submit" className="login-btn">Login</button>
+        {errorMessage && <div className="error-message">{errorMessage}</div>}
+        <button type="submit" className="login-btn" disabled={loading}>
+          {loading ? 'Logging in...' : 'Login'}
+        </button>
       </form>
     </div>
   );

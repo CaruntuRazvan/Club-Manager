@@ -244,3 +244,19 @@
     padding: 40px 20px 20px;
     /* Mai mult padding sus pentru a face loc pentru X */
 }
+/* Stil pentru cardul jucătorului logat */
+.player-card.current-user {
+    border: 3px solid #1e3a8a;
+}
+
+.player-card.current-user::after {
+    content: '★';
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    background-color: #1e3a8a;
+    color: white;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-size: 0.9em;
+}

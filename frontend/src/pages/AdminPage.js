@@ -3,14 +3,11 @@ import { fetchUsers, addUser, fetchCurrentUser, deleteUser, editUser } from '../
 import UserForm from '../components/UserForm';
 import UserList from '../components/UserList';
 import EditUserForm from '../components/EditUserForm';
-import UserProfile from '../components/UserProfile'; // Importăm noua componentă
+import UserProfile from '../components/UserProfile';
 import AboutTeam from './AboutTeam';
-import { Bar, Pie } from 'react-chartjs-2';
-import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, ArcElement } from 'chart.js';
+import AdminCharts from '../components/AdminCharts'; // Importăm noua componentă
 import '../styles/AdminPage.css';
 import '../styles/GlobalStyles.css';
-
-ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, ArcElement);
 
 const AdminPage = ({ userId, handleLogout }) => {
   const [users, setUsers] = useState([]);
@@ -131,37 +128,13 @@ const AdminPage = ({ userId, handleLogout }) => {
     acc[nat] = (acc[nat] || 0) + 1;
     return acc;
   }, {});
-  const nationalityLabels = Object.keys(nationalities);
-  const nationalityData = Object.values(nationalities);
-
-  const chartData = {
-    labels: [`Admini (${totalAdmins})`, `Jucători (${totalPlayers})`, `Manageri (${totalManagers})`, `Staff (${totalStaff})`],
-    datasets: [
-      { label: `Număr admini`, data: [totalAdmins, 0, 0, 0], backgroundColor: '#FF5733', borderColor: '#FF5733', borderWidth: 1 },
-      { label: `Număr jucători`, data: [0, totalPlayers, 0, 0], backgroundColor: '#33FF57', borderColor: '#33FF57', borderWidth: 1 },
-      { label: `Număr manageri`, data: [0, 0, totalManagers, 0], backgroundColor: '#3357FF', borderColor: '#3357FF', borderWidth: 1 },
-      { label: `Număr staff`, data: [0, 0, 0, totalStaff], backgroundColor: '#FFD700', borderColor: '#FFD700', borderWidth: 1 },
-    ],
+  // Modificăm handleLogout pentru a include confirmarea
+  const handleLogoutWithConfirm = () => {
+    const confirmLogout = window.confirm('Ești sigur că vrei să te deconectezi?');
+    if (confirmLogout) {
+      handleLogout(); // Apelăm funcția de logout doar dacă utilizatorul confirmă
+    }
   };
-
-  const chartOptions = {
-    responsive: true,
-    maintainAspectRatio: false,
-    scales: { y: { ticks: { stepSize: 1 }, min: 0, max: Math.max(totalAdmins, totalPlayers, totalManagers, totalStaff) + 1 }, x: { ticks: { font: { size: 14 } } } },
-    plugins: { legend: { display: true, position: 'top', labels: { font: { size: 14 }, boxWidth: 20 } }, title: { display: true, text: 'Număr utilizatori pe categorii', font: { size: 18 } } },
-  };
-
-  const nationalityChartData = {
-    labels: nationalityLabels,
-    datasets: [{ label: 'Naționalități', data: nationalityData, backgroundColor: ['#FF5733', '#33FF57', '#3357FF', '#FFD700', '#FF00FF', '#00CED1'], borderColor: ['#FFFFFF'], borderWidth: 1 }],
-  };
-
-  const nationalityChartOptions = {
-    responsive: true,
-    maintainAspectRatio: false,
-    plugins: { legend: { position: 'top' }, title: { display: true, text: 'Distribuția naționalităților jucătorilor', font: { size: 18 } } },
-  };
-
   return (
     <div className="admin-container">
       <nav className="sidebar">
@@ -183,7 +156,7 @@ const AdminPage = ({ userId, handleLogout }) => {
       <div className="main-content">
         <header className="header">
           <h1>Admin Dashboard</h1>
-          <button onClick={handleLogout} className="logout-btn">
+          <button onClick={handleLogoutWithConfirm} className="logout-btn">
             <span className="logout-text">Logout</span>
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-box-arrow-right" viewBox="0 0 16 16">
               <path fillRule="evenodd" d="M10 12.5a.5.5 0 0 1-.5.5h-8a.5.5 0 0 1-.5-.5v-9a.5.5 0 0 1 .5-.5h8a.5.5 0 0 1 .5.5v2a.5.5 0 0 0 1 0v-2A1.5 1.5 0 0 0 9.5 2h-8A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h8a1.5 1.5 0 0 0 1.5-1.5v-2a.5.5 0 0 0-1 0v2z" />
@@ -200,7 +173,6 @@ const AdminPage = ({ userId, handleLogout }) => {
           </section>
         )}
 
-        {/* Înlocuim secțiunea selectedUser cu UserProfile */}
         {selectedUser && (
           <UserProfile user={selectedUser} onClose={() => setSelectedUser(null)} calculateAge={calculateAge} />
         )}
@@ -263,18 +235,17 @@ const AdminPage = ({ userId, handleLogout }) => {
                 <p>{averageAge.toFixed(1)} ani</p>
               </div>
             </div>
-            <div className="charts-wrapper">
-              <div className="chart-item">
-                <div style={{ height: '300px', width: '500px' }}>
-                  <Bar data={chartData} options={chartOptions} />
-                </div>
-              </div>
-              <div className="chart-item">
-                <div style={{ height: '300px', width: '400px' }}>
-                  <Pie data={nationalityChartData} options={nationalityChartOptions} />
-                </div>
-              </div>
-            </div>
+            {adminInfo?.role === 'admin' && (
+              <AdminCharts
+                totalAdmins={totalAdmins}
+                totalPlayers={totalPlayers}
+                totalManagers={totalManagers}
+                totalStaff={totalStaff}
+                newPlayersLastMonth={newPlayersLastMonth}
+                averageAge={averageAge}
+                nationalities={nationalities}
+              />
+            )}
           </section>
         )}
       </div>

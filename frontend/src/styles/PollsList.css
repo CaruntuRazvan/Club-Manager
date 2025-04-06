@@ -1,0 +1,171 @@
+/* Stiluri generale pentru secțiunea de sondaje */
+.polls-section {
+    padding: 15px;
+    width: 100%;
+    max-width: 600px;
+    /* Reducem lățimea maximă pentru minimalism */
+    margin: 0;
+    /* Eliminăm marginile automate pentru aliniere la stânga */
+}
+
+/* Container pentru lista de sondaje */
+.polls-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    /* Reducem spațiul între sondaje */
+}
+
+/* Fiecare item de sondaj */
+.poll-item {
+    background-color: #ffffff;
+    border-radius: 8px;
+    padding: 15px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.03);
+    /* Umbră mai subtilă */
+    transition: box-shadow 0.2s ease;
+    position: relative;
+}
+
+.poll-item:hover {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.06);
+    /* Efect mai subtil */
+}
+
+.poll-item h4 {
+    margin: 0 0 8px;
+    font-size: 1.2rem;
+    /* Font mai mic */
+    color: #333;
+    font-weight: 500;
+}
+
+.poll-item p {
+    margin: 4px 0;
+    color: #666;
+    font-size: 0.85rem;
+    /* Text mai mic */
+}
+
+/* Container pentru opțiunile de vot */
+.poll-options {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    /* Reducem spațiul între butoane */
+    margin-top: 10px;
+}
+
+/* Butoane de vot */
+.vote-btn {
+    background-color: #3788d8;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    /* Butoane mai mici */
+    border-radius: 20px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.vote-btn:hover {
+    background-color: #2a6aa6;
+}
+
+/* Buton pentru rezultate */
+.view-results-btn {
+    background-color: #3b82f6;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    margin-top: 10px;
+    transition: background-color 0.3s ease;
+}
+
+.view-results-btn:hover {
+    background-color: #1a3c6e;
+}
+
+/* Text pentru cazul în care nu există sondaje */
+.polls-list p {
+    color: #888;
+    font-size: 1rem;
+    margin-top: 15px;
+}
+
+/* Container pentru rezultate (acum parte din poll-item) */
+.poll-results {
+    margin-top: 15px;
+    padding: 10px;
+    background-color: #f5f5f5;
+    /* Fundal mai discret */
+    border-radius: 8px;
+}
+
+.poll-results h3 {
+    margin: 0 0 10px;
+    font-size: 1.1rem;
+    color: #333;
+}
+
+/* Stilizare pentru grafic */
+.poll-results .chart-container {
+    max-width: 100%;
+    /* Se ajustează la lățimea poll-item */
+    height: 200px;
+    /* Înălțime fixă pentru consistență */
+}
+
+/* Stilizare pentru butonul de ștergere (coș de gunoi) */
+.delete-poll-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    color: #f44336;
+    /* Culoare roșie pentru coș */
+    transition: color 0.3s ease;
+}
+
+.delete-poll-btn:hover {
+    color: #d32f2f;
+    /* Roșu mai închis la hover */
+}
+
+.delete-poll-btn svg {
+    width: 18px;
+    height: 18px;
+}
+/* Responsivitate */
+@media (max-width: 768px) {
+    .polls-section {
+        padding: 10px;
+        max-width: 100%;
+    }
+
+    .poll-item {
+        padding: 12px;
+    }
+
+    .poll-item h4 {
+        font-size: 1.1rem;
+    }
+
+    .vote-btn,
+    .view-results-btn,
+    .close-results-btn {
+        padding: 5px 10px;
+        font-size: 0.85rem;
+    }
+    .delete-poll-btn {
+        top: 8px;
+        right: 8px;
+    }
+}

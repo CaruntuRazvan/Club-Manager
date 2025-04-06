@@ -94,7 +94,51 @@
     transform: translateY(-2px);
     /* Efect de ridicare la hover */
 }
+.login-btn:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+.password-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
 
+.password-wrapper input {
+    width: 100%;
+    padding-right: 40px;
+    /* Spațiu pentru emoji */
+}
+
+.show-password-btn {
+    position: absolute;
+    right: 10px;
+    background: none;
+    border: none;
+    font-size: 1.2em;
+    /* Mărime potrivită pentru emoji */
+    cursor: pointer;
+    padding: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.show-password-btn:hover .eye-icon {
+    opacity: 0.8;
+    /* Efect subtil la hover */
+}
+
+.show-password-btn:disabled .eye-icon {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.eye-icon {
+    display: inline-block;
+    line-height: 1;
+}
 /* Responsive design - ajustări pentru ecrane mai mici */
 @media (max-width: 480px) {
     .login-form {

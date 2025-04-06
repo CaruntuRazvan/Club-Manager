@@ -33,6 +33,25 @@ export const fetchPlayers = async () => {
     return [];
   }
 };
+
+export const fetchStaff = async () => {
+  try {
+    const response = await fetch('http://localhost:5000/api/users?role=staff');
+    const data = await response.json();
+    if (response.ok) {
+      const staff = data.filter(user => user.role === 'staff');
+      console.log('Staff preluat:', staff);
+      return staff;
+    } else {
+      console.error('Error:', data.message);
+      return [];
+    }
+  } catch (error) {
+    console.error('Error:', error);
+    return [];
+  }
+};
+
 export const addUser = async (userData) => {
   try {
     const token = localStorage.getItem('token'); // Obținem token-ul din localStorage
